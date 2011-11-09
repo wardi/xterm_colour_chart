@@ -379,13 +379,14 @@ def parse_chart(chart):
     return oall
 
 
-def draw_chart(chart, origin, angle, numbers, cell_cols, cell_rows):
+def draw_chart(chart, origin, angle, numbers, decimals, cell_cols, cell_rows):
     """Draw a colour chart on the screen.
 
     chart -- chart data parsed by parse_chart()
     origin -- 0..7 origin of colour cube
     angle -- 0..5 rotation angle of colour cube
     numbers -- if True display hex palette numbers on the chart
+    decimals -- if True display decimal palette numbers on the chart
     cell_cols -- number of screen columns per cell
     cell_rows -- number of screen rows per cell
     """
@@ -395,6 +396,8 @@ def draw_chart(chart, origin, angle, numbers, cell_cols, cell_rows):
 
     if numbers and cell_cols<2:
         cell_cols=2
+    if decimals and cell_cols<3:
+        cell_cols=3
     cell_pad = " "*cell_cols
     
     def transform_block(n, row):
@@ -405,14 +408,20 @@ def draw_chart(chart, origin, angle, numbers, cell_cols, cell_rows):
         return block(vtrans, row)
 
     def block(n, row):
-        if not numbers or row!=cell_rows-1:
+        if not (numbers or decimals) or row!=cell_rows-1:
             return "\x1b[48;5;%dm%s" % (n, cell_pad)
         y = n_to_gray(n)
         if y>0x30:
             # use black text
-            return "\x1b[48;5;%d;30m%02x%s" % (n, n, cell_pad[2:])
+            if numbers:
+                return "\x1b[48;5;%d;30m%02x%s" % (n, n, cell_pad[2:])
+            elif decimals:
+                return "\x1b[48;5;%d;30m%03d%s" % (n, n, cell_pad[3:])
         # else use gray text
-        return "\x1b[48;5;%d;37m%02x%s" % (n, n, cell_pad[2:])
+        if numbers:
+            return "\x1b[48;5;%d;37m%02x%s" % (n, n, cell_pad[2:])
+        elif decimals:
+            return "\x1b[48;5;%d;37m%03d%s" % (n, n, cell_pad[3:])
 
     def blank():
         return "\x1b[0m%s" % (cell_pad,)
@@ -455,6 +464,9 @@ def main():
     parser.add_option("-n", "--numbers", action="store_true",
         dest="numbers", default=False,
         help="display hex colour numbers on chart")
+    parser.add_option("-d", "--decimals", action="store_true",
+        dest="decimals", default=False,
+        help="display decimal colour numbers on chart")
     parser.add_option("-x", "--cell-columns", dest="columns", type="int",
         default=2, metavar="COLS",
         help="set the number of columns for drawing each colour cell "
@@ -501,7 +513,7 @@ def main():
             error("Chart %r not found!" % cname)
             continue
         chart = parse_chart(charts[colours][cname])
-        draw_chart(chart, options.origin, options.angle, options.numbers,
+        draw_chart(chart, options.origin, options.angle, options.numbers, options.decimals,
             options.columns, options.rows)
 
 
