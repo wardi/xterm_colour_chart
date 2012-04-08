@@ -3,7 +3,7 @@
 """
 XTerm Colour Chart
 
-Ian Ward, 2007-2011
+Ian Ward, 2007-2012
 This file is in the Public Domain, do with it as you wish.
 """
 
