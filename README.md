@@ -1,9 +1,9 @@
 
 # xterm_colour_chart
 
-XTerm Colour Chart 2.0 “Old and busted: Colour Cubes. New hotness: Colour Cows” release.
+http://excess.org/article/2007/10/xterm-256-colour-chart-20/
 
-The script has been completely rewritten. It now requires python 2.3 or later for the optparse command-line parsing module.
+XTerm Colour Chart 2.0 “Old and busted: Colour Cubes. New hotness: Colour Cows” release.
 
 
 ## Features
