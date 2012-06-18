@@ -28,6 +28,7 @@ XTerm Colour Chart 2.0 “Old and busted: Colour Cubes. New hotness: Colour Cows
       -o NUM, --origin=NUM  set the origin of the colour cube: 0-7 [default: 0]
       -a NUM, --angle=NUM   set the angle of the colour cube: 0-5 [default: 0]
       -n, --numbers         display hex colour numbers on chart
+      -d, --decimal         display decimal colour numbers on chart
       -x COLS, --cell-columns=COLS
                             set the number of columns for drawing each colour cell
                             [default: 2]
