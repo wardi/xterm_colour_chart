@@ -326,6 +326,25 @@ def prt_to_n(prt):
         n = cube_start + (a*cube_size + b)*cube_size + c
     return n
 
+def urwidify(num):
+    """Return an urwid palette colour name for num"""
+    if num < cube_start:
+        return 'h%d' % num
+    if num < gray_start:
+        num -= cube_start
+        b, num = num % cube_size, num // cube_size
+        g, num = num % cube_size, num // cube_size
+        r = num % cube_size
+        return '#%x%x%x' % (int_scale(cube_steps[r], 256, 16),
+            int_scale(cube_steps[g], 256, 16),
+            int_scale(cube_steps[b], 256, 16))
+    return 'g%d' % (int_scale(gray_steps[num - gray_start], 256, 101))
+
+def int_scale(val, val_range, out_range):
+    num = int(val * (out_range-1) * 2 + (val_range-1))
+    dem = ((val_range-1) * 2)
+    return num // dem
+
 def distance(n1, n2):
     """Calculate the distance between colours in the colour cube.
     Distance is absolute cube coordinates, not actual colour distance.
@@ -379,7 +398,7 @@ def parse_chart(chart):
     return oall
 
 
-def draw_chart(chart, origin, angle, hexadecimal, decimal, cell_cols,
+def draw_chart(chart, origin, angle, hexadecimal, decimal, urwidmal, cell_cols,
         cell_rows):
     """Draw a colour chart on the screen.
 
@@ -388,6 +407,7 @@ def draw_chart(chart, origin, angle, hexadecimal, decimal, cell_cols,
     angle -- 0..5 rotation angle of colour cube
     hexadecimal -- if True display hex palette numbers on the chart
     decimal -- if True display decimal palette numbers on the chart
+    urwidmal -- if True display urwid palette colour on the chart
     cell_cols -- number of screen columns per cell
     cell_rows -- number of screen rows per cell
     """
@@ -395,12 +415,14 @@ def draw_chart(chart, origin, angle, hexadecimal, decimal, cell_cols,
     omap = [(1,1,1), (1,1,-1), (1,-1,-1), (1,-1,1),
         (-1,-1,1), (-1,-1,-1), (-1,1,-1), (-1,1,1)][origin]
 
-    if hexadecimal and cell_cols<2:
-        cell_cols=2
-    if decimal and cell_cols<3:
-        cell_cols=3
+    if hexadecimal and cell_cols < 2:
+        cell_cols = 2
+    elif decimal and cell_cols < 3:
+        cell_cols = 3
+    elif urwidmal and cell_cols < 4:
+        cell_cols = 4
     cell_pad = " "*cell_cols
-    
+
     def transform_block(n, row):
         v = cube_vals(n)
         v = [(int(om/2) + om * n) % cube_size for n, om in zip(v, omap)]
@@ -409,7 +431,7 @@ def draw_chart(chart, origin, angle, hexadecimal, decimal, cell_cols,
         return block(vtrans, row)
 
     def block(n, row):
-        if not (hexadecimal or decimal) or row!=cell_rows-1:
+        if not any((hexadecimal, decimal, urwidmal)) or row!=cell_rows-1:
             return "\x1b[48;5;%dm%s" % (n, cell_pad)
         y = n_to_gray(n)
         if y>0x30:
@@ -418,11 +440,15 @@ def draw_chart(chart, origin, angle, hexadecimal, decimal, cell_cols,
                 return "\x1b[48;5;%d;30m%02x%s" % (n, n, cell_pad[2:])
             elif decimal:
                 return "\x1b[48;5;%d;30m%03d%s" % (n, n, cell_pad[3:])
+            elif urwidmal:
+                return "\x1b[48;5;%d;30m%4s%s" % (n, urwidify(n), cell_pad[4:])
         # else use gray text
         if hexadecimal:
             return "\x1b[48;5;%d;37m%02x%s" % (n, n, cell_pad[2:])
         elif decimal:
             return "\x1b[48;5;%d;37m%03d%s" % (n, n, cell_pad[3:])
+        elif urwidmal:
+            return "\x1b[48;5;%d;37m%4s%s" % (n, urwidify(n), cell_pad[4:])
 
     def blank():
         return "\x1b[0m%s" % (cell_pad,)
@@ -468,6 +494,9 @@ def main():
     parser.add_option("-d", "--decimal", action="store_true",
         dest="decimal", default=False,
         help="display decimal colour numbers on chart")
+    parser.add_option("-u", "--urwid", action="store_true",
+        dest="urwidmal", default=False,
+        help="display urwid palette colour on chart")
     parser.add_option("-x", "--cell-columns", dest="columns", type="int",
         default=2, metavar="COLS",
         help="set the number of columns for drawing each colour cell "
@@ -515,7 +544,7 @@ def main():
             continue
         chart = parse_chart(charts[colours][cname])
         draw_chart(chart, options.origin, options.angle, options.hexadecimal,
-            options.decimal, options.columns, options.rows)
+            options.decimal, options.urwidmal, options.columns, options.rows)
 
 
 
