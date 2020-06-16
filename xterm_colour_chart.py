@@ -273,9 +273,9 @@ def cube_vals(n):
     assert n>=cube_start and n<gray_start
     val = n-cube_start
     c = val % cube_size
-    val = val / cube_size
+    val = val // cube_size
     b = val % cube_size
-    a = val / cube_size
+    a = val // cube_size
     return a, b, c
 
 def n_to_rgb(n):
@@ -465,7 +465,7 @@ def draw_chart(chart, origin, angle, hexadecimal, decimal, urwidmal, cell_cols,
                     out.append(transform_block(n, row))
                 else:
                     out.append(block(n, row))
-            print "".join(out) + "\x1b[0m"
+            print("".join(out) + "\x1b[0m")
 
 def reset_palette():
     """Reset the terminal palette."""
@@ -525,9 +525,9 @@ def main():
     if options.colours_88:
         set_88_colour_mode()
     if options.list_charts:
-        print "Charts available in %d-colour mode:" % colours
-        for cname in charts[colours].keys():
-            print "  "+cname
+        print("Charts available in %d-colour mode:" % colours)
+        for cname in list(charts[colours].keys()):
+            print("  "+cname)
         sys.exit(0)
     if options.reset_palette:
         reset_palette()
@@ -537,7 +537,7 @@ def main():
     first = True
     for cname in args:
         if not first:
-            print
+            print()
         first = False
         if cname not in charts[colours]:
             error("Chart %r not found!" % cname)
