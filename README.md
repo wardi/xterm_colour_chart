@@ -5,7 +5,7 @@ http://excess.org/article/2007/10/xterm-256-colour-chart-20/
 
 XTerm Colour Chart 2.0 “Old and busted: Colour Cubes. New hotness: Colour Cows” release.
 
-![Colour Cows Screen Shot](http://excess.org/media/image/2007/10/colour_chart_sm.png)
+![Colour Cows Screen Shot](https://excess.org/images/colour_chart_sm.png)
 
 ## Features
 
